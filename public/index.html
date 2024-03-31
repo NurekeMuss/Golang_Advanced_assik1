@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TCP Server Client Demo</title>
+    <style>
+        #chat-container {
+            width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #messages {
+            height: 200px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="messages"></div>
+        <input type="text" id="message-input" placeholder="Enter message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        const ws = new WebSocket("ws://localhost:8080/ws");
+
+        ws.onopen = function(event) {
+            displayMessage("Connected to server");
+        };
+
+        ws.onmessage = function(event) {
+            displayMessage(event.data);
+        };
+
+        ws.onerror = function(event) {
+            displayMessage("Error: " + event.data);
+        };
+
+        function sendMessage() {
+            const messageInput = document.getElementById("message-input");
+            const message = messageInput.value.trim();
+            if (message !== "") {
+                ws.send(message);
+                displayMessage("You: " + message);
+                messageInput.value = "";
+            }
+        }
+
+        function displayMessage(message) {
+            const messagesContainer = document.getElementById("messages");
+            messagesContainer.innerHTML += "<p>" + message + "</p>";
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>
